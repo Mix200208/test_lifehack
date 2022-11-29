@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.rv.ListCompanyAdapter
+import com.example.myapplication.server.Api
 import com.example.myapplication.server.ServerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -22,22 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main)
-        val interceptor = run {
-            val httpLoggingInterceptor = HttpLoggingInterceptor()
-            httpLoggingInterceptor.apply {
-                httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-            }
-        }
 
-        val okHttpClient = OkHttpClient.Builder()
-            .addNetworkInterceptor(interceptor)
-            .build()
-
-        val api: ServerService = Retrofit.Builder().baseUrl("https://lifehack.studio/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-            .create(ServerService::class.java)
 
         val adapter = ListCompanyAdapter(){
             val intent = Intent(this,DetailActivity::class.java)
@@ -48,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
 
 
-            val response = api.getListCompany()
+            val response = Api.api.getListCompany()
 
             GlobalScope.launch(Dispatchers.Main){
                 binding.prBar.visibility = View.GONE
